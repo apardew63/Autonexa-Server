@@ -102,12 +102,15 @@ export const login = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
+    console.log('=== PROFILE UPDATE REQUEST ===');
+    console.log('Request body:', req.body);
+    console.log('Request user:', req.user);
+
     const { name, phone, address, city } = req.body;
     const userId = req.user._id;
 
     console.log('Updating profile for user:', userId);
     console.log('Update data:', { name, phone, address, city });
-    console.log('req.user:', req.user);
 
     // Validate that we have a user ID
     if (!userId) {
@@ -124,6 +127,13 @@ export const updateProfile = async (req, res) => {
 
     console.log('Final update data:', updateData);
 
+    // Check if updateData is empty
+    if (Object.keys(updateData).length === 0) {
+      console.log('No valid fields to update');
+      return res.status(400).json({ message: "No valid fields to update" });
+    }
+
+    console.log('Executing database update...');
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       updateData,
@@ -136,13 +146,19 @@ export const updateProfile = async (req, res) => {
     }
 
     console.log('Profile updated successfully:', updatedUser);
+    console.log('=== PROFILE UPDATE SUCCESS ===');
+
     res.json({
       message: "Profile updated successfully",
       user: updatedUser,
     });
   } catch (err) {
-    console.error("Profile update error:", err);
+    console.error("=== PROFILE UPDATE ERROR ===");
+    console.error("Error:", err);
+    console.error("Error message:", err.message);
     console.error("Error stack:", err.stack);
+    console.error("Request body:", req.body);
+    console.error("Request user:", req.user);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };

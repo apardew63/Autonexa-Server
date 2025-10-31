@@ -16,19 +16,21 @@ const verifyToken = async (req, res, next) => {
         }
 
         const token = tokenParts[1];
-        console.log('Token to verify:', token);
-        console.log('JWT_SECRET:', process.env.JWT_SECRET);
+        console.log('Token to verify:', token.substring(0, 20) + '...'); // Log partial token for security
+        console.log('JWT_SECRET exists:', !!process.env.JWT_SECRET);
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if (!decoded) {
             return res.status(401).json({ success: false, error: "Unauthorized: Invalid token" });
         }
 
+        console.log('Decoded token:', { _id: decoded._id, iat: decoded.iat, exp: decoded.exp });
         const user = await User.findById(decoded._id).select('-password');
         if (!user) {
             return res.status(404).json({ success: false, error: "User not found" });
         }
 
+        console.log('User found:', { _id: user._id, name: user.name, email: user.email });
         req.user = user;
         next();
     } catch (error) {
