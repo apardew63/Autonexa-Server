@@ -2,6 +2,7 @@ import express from "express";
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 import User from "../model/User.js";
 
 const router = express.Router();
@@ -103,8 +104,8 @@ export const login = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     console.log('=== PROFILE UPDATE REQUEST ===');
-    console.log('Request body:', req.body);
-    console.log('Request user:', req.user);
+    console.log('Request body:', JSON.stringify(req.body, null, 2));
+    console.log('Request user:', JSON.stringify(req.user, null, 2));
 
     const { name, phone, address, city } = req.body;
     const userId = req.user._id;
@@ -125,7 +126,7 @@ export const updateProfile = async (req, res) => {
     if (address !== undefined) updateData.address = address;
     if (city !== undefined) updateData.city = city;
 
-    console.log('Final update data:', updateData);
+    console.log('Final update data:', JSON.stringify(updateData, null, 2));
 
     // Check if updateData is empty
     if (Object.keys(updateData).length === 0) {
@@ -134,6 +135,8 @@ export const updateProfile = async (req, res) => {
     }
 
     console.log('Executing database update...');
+    console.log('MongoDB connection ready state:', mongoose.connection.readyState);
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       updateData,
@@ -145,7 +148,7 @@ export const updateProfile = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    console.log('Profile updated successfully:', updatedUser);
+    console.log('Profile updated successfully:', JSON.stringify(updatedUser, null, 2));
     console.log('=== PROFILE UPDATE SUCCESS ===');
 
     res.json({
@@ -154,12 +157,21 @@ export const updateProfile = async (req, res) => {
     });
   } catch (err) {
     console.error("=== PROFILE UPDATE ERROR ===");
-    console.error("Error:", err);
+    console.error("Error type:", err.constructor.name);
     console.error("Error message:", err.message);
+    console.error("Error code:", err.code);
     console.error("Error stack:", err.stack);
-    console.error("Request body:", req.body);
-    console.error("Request user:", req.user);
-    res.status(500).json({ message: "Server error", error: err.message });
+    console.error("Request body:", JSON.stringify(req.body, null, 2));
+    console.error("Request user:", JSON.stringify(req.user, null, 2));
+    console.error("MongoDB connection state:", mongoose.connection.readyState);
+
+    // Send more detailed error for debugging
+    res.status(500).json({
+      message: "Server error",
+      error: err.message,
+      type: err.constructor.name,
+      code: err.code
+    });
   }
 };
 
