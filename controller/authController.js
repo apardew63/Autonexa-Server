@@ -105,6 +105,9 @@ export const updateProfile = async (req, res) => {
     const { name, phone, address, city } = req.body;
     const userId = req.user._id;
 
+    console.log('Updating profile for user:', userId);
+    console.log('Update data:', { name, phone, address, city });
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { name, phone, address, city },
@@ -112,9 +115,11 @@ export const updateProfile = async (req, res) => {
     );
 
     if (!updatedUser) {
+      console.log('User not found for update');
       return res.status(404).json({ message: "User not found" });
     }
 
+    console.log('Profile updated successfully:', updatedUser);
     res.json({
       message: "Profile updated successfully",
       user: updatedUser,
