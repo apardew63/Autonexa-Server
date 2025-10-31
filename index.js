@@ -21,7 +21,7 @@ const app = express();
 
 //*************** CORS CONFIGURATION ***************
 app.use(cors({
-  origin: 'https://autonexa.vercel.app',
+  origin: process.env.FRONTEND_URL,
   credentials: true
 }));
 app.use(express.json());
@@ -49,6 +49,9 @@ app.use('/api/showrooms', showroomRouter);
 app.use('/api/dashboard', dashboardRouter);
 app.use('/api/favorites', favoriteRouter);
 app.use('/api/user', authRouter);
+
+// Add dashboard routes for frontend navigation
+app.use('/dashboard', dashboardRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);

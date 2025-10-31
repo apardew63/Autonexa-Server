@@ -107,10 +107,26 @@ export const updateProfile = async (req, res) => {
 
     console.log('Updating profile for user:', userId);
     console.log('Update data:', { name, phone, address, city });
+    console.log('req.user:', req.user);
+
+    // Validate that we have a user ID
+    if (!userId) {
+      console.log('No user ID found in request');
+      return res.status(400).json({ message: "User ID not found" });
+    }
+
+    // Build update object with only provided fields
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (phone !== undefined) updateData.phone = phone;
+    if (address !== undefined) updateData.address = address;
+    if (city !== undefined) updateData.city = city;
+
+    console.log('Final update data:', updateData);
 
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { name, phone, address, city },
+      updateData,
       { new: true, select: '-password' }
     );
 
@@ -126,7 +142,8 @@ export const updateProfile = async (req, res) => {
     });
   } catch (err) {
     console.error("Profile update error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error stack:", err.stack);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
