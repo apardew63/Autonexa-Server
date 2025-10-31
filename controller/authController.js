@@ -6,13 +6,11 @@ import User from "../model/User.js";
 
 const router = express.Router();
 
-// Email/Password Registration
 export const register = async (req, res) => {
   try {
     console.log(req.body);
     const { name, email, password, role, phone, address, city } = req.body;
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });

@@ -21,7 +21,7 @@ const app = express();
 
 //*************** CORS CONFIGURATION ***************
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: 'https://autonexa.vercel.app',
   credentials: true
 }));
 app.use(express.json());
