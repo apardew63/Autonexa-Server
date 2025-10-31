@@ -100,4 +100,29 @@ export const login = async (req, res) => {
 };
 
 
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, phone, address, city } = req.body;
+    const userId = req.user._id;
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, phone, address, city },
+      { new: true, select: '-password' }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (err) {
+    console.error("Profile update error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export default router;

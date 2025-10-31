@@ -3,7 +3,7 @@ import passport from "passport";
 import jwt from "jsonwebtoken";
 import authMiddleware from "../middleware/authMiddleware.js";
 import User from "../model/User.js";
-import { register, login } from "../controller/authController.js";
+import { register, login, updateProfile } from "../controller/authController.js";
 
 const router = express.Router();
 
@@ -15,5 +15,10 @@ router.get("/verify", authMiddleware, (req, res) => {
   return res.status(200).json({ success: true, user: req.user });
 });
 
+router.get("/profile", authMiddleware, (req, res) => {
+  return res.status(200).json({ success: true, user: req.user });
+});
+
+router.put("/profile", authMiddleware, updateProfile);
 
 export default router;
